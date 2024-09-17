@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Custos</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: rgba(46, 46, 46, 0.8); /* Vidro fosco */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 1400px; /* Aumentar o tamanho do quadro geral */
+            display: flex;
+            flex-direction: row; /* Layout horizontal */
+            gap: 30px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .section {
+            background-color: rgba(0, 0, 0, 0.5); /* Translucido */
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 16px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        h1, h2 {
+            margin: 0;
+            font-weight: bold;
+            text-align: center; /* Centralizar o texto */
+        }
+        h1 {
+            font-size: 24px; /* Tamanho do título principal */
+            border-bottom: 2px solid #4CAF50; /* Linha embaixo para destacar */
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 20px; /* Tamanho do título secundário */
+            border-bottom: 1px solid #4CAF50; /* Linha embaixo para destacar */
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .input-group, .checkbox-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 12px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #3e3e3e;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .slider {
+            -webkit-appearance: none;
+            width: calc(100% - 60px);
+            height: 8px;
+            border-radius: 5px;
+            background: #555;
+            outline: none;
+            opacity: 0.8;
+            transition: opacity .15s ease-in-out;
+            margin-right: 10px;
+        }
+        .slider:hover {
+            opacity: 1;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+        .slider-value {
+            font-size: 16px;
+            color: #fff;
+            width: 60px;
+            text-align: center;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .checkbox-group input {
+            margin-right: 5px;
+        }
+        .section:last-child {
+            display: flex;
+            flex-direction: column;
+        }
+        .section:last-child .input-group, 
+        .section:last-child .checkbox-group {
+            margin-bottom: 10px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section">
+            <h1>Preencha os Campos</h1>
+
+            <!-- Campos para o usuário digitar o peso e tempo de impressão -->
+            <div class="input-group">
+                <label for="peso">Peso (gramas)</label>
+                <input type="number" id="peso" placeholder="Digite o peso (g)">
+            </div>
+
+            <div class="input-group">
+                <label for="tempo">Tempo de Impressão</label>
+                <input type="number" id="tempo" placeholder="Digite o tempo">
+            </div>
+
+            <div class="input-group">
+                <label for="unidadeTempo">Unidade de Tempo</label>
+                <select id="unidadeTempo">
+                    <option value="minutos">Minutos</option>
+                    <option value="horas">Horas</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="lucro">Porcentagem de Lucro</label>
+                <div class="slider-container">
+                    <input type="range" id="lucro" min="0" max="1000" value="100" step="5" class="slider" oninput="updateSliderValue(this.value)">
+                    <div class="slider-value" id="sliderValue">100%</div>
+                </div>
+            </div>
+
+            <!-- Checkbox para seleção dos parâmetros -->
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="showEnergia" checked> Ener.</label>
+                <label><input type="checkbox" id="showDepreciacao" checked> Depr.</label>
+                <label><input type="checkbox" id="showMaoDeObra" checked> M.O.</label>
+                <label><input type="checkbox" id="showFilamento" checked> Fila.</label>
+            </div>
+
+            <!-- Botão para calcular custo -->
+            <button onclick="calcularCusto()">Calcular Custo</button>
+        </div>
+
+        <div class="section">
+            <h1>Resultado</h1>
+            <div class="input-group">
+                <label for="custo">Custo Total</label>
+                <input type="text" id="custo" readonly>
+            </div>
+
+            <div class="input-group">
+                <label for="valorVenda">Valor Sugerido para Venda</label>
+                <input type="text" id="valorVenda" readonly>
+            </div>
+        </div>
+
+        <div class="section">
+            <h1>Parâmetros de Custo</h1>
+            <div class="input-group">
+                <label><strong>Custo da Energia:</strong> R$ 1,30 por hora</label>
+            </div>
+            <div class="input-group">
+                <label><strong>Custo do Filamento:</strong> R$ 0,13 por grama</label>
+            </div>
+            <div class="input-group">
+                <label><strong>Custo de Depreciação:</strong> R$ 4,08 por hora</label>
+            </div>
+            <div class="input-group">
+                <label><strong>Mão de Obra:</strong> 30% do custo total</label>
+            </div>
+            <p class="nota">Você pode alterar esses valores diretamente no código se necessário.</p>
+        </div>
+    </div>
+
+    <script>
+        function calcularCusto() {
+            const peso = parseFloat(document.getElementById('peso').value);
+            const tempo = parseFloat(document.getElementById('tempo').value);
+            const unidadeTempo = document.getElementById('unidadeTempo').value;
+            const lucroPercentual = parseFloat(document.getElementById('lucro').value) / 100;
+
+            // Definir valores de custo (exemplos)
+            const custoEnergiaPorHora = 1.30;
+            const custoFilamentoPorGrama = 0.13;
+            const custoDepreciacaoPorHora = 4.08;
+            const percentualMaoDeObra = 0.30; // 30%
+
+            // Verificar se as checkboxes estão marcadas
+            const showEnergia = document.getElementById('showEnergia').checked;
+            const showDepreciacao = document.getElementById('showDepreciacao').checked;
+            const showMaoDeObra = document.getElementById('showMaoDeObra').checked;
+            const showFilamento = document.getElementById('showFilamento').checked;
+
+            // Converter tempo para horas se necessário
+            let tempoEmHoras = unidadeTempo === 'minutos' ? tempo / 60 : tempo;
+
+            // Calcular custos
+            let custoEnergia = showEnergia ? custoEnergiaPorHora * tempoEmHoras : 0;
+            let custoFilamento = showFilamento ? custoFilamentoPorGrama * peso : 0;
+            let custoDepreciacao = showDepreciacao ? custoDepreciacaoPorHora * tempoEmHoras : 0;
+
+            // Calcular custo total sem a mão de obra
+            let custoTotal = custoEnergia + custoFilamento + custoDepreciacao;
+
+            // Aplicar mão de obra se estiver marcada
+            if (showMaoDeObra) {
+                custoTotal *= (1 + percentualMaoDeObra);
+            }
+
+            // Calcular valor de venda com lucro
+            let valorVenda = custoTotal * (1 + lucroPercentual);
+
+            // Atualizar campos
+            document.getElementById('custo').value = `R$ ${custoTotal.toFixed(2)}`;
+            document.getElementById('valorVenda').value = `R$ ${valorVenda.toFixed(2)}`;
+        }
+
+        function updateSliderValue(value) {
+            document.getElementById('sliderValue').innerText = `${value}%`;
+        }
+    </script>
+</body>
+</html>
